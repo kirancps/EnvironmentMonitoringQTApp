@@ -7,6 +7,9 @@
 #include<QTimer>
 #include <QtMultimedia>
 #include <QMediaPlayer>
+#include <QCamera>
+#include <QCameraViewfinder>
+#include <QVBoxLayout>
 int i=0;
 
 QSerialPort *serial;
@@ -20,6 +23,18 @@ serialComm::serialComm(QWidget *parent) :
     ui(new Ui::serialComm)
 {
     ui->setupUi(this);
+
+    mCamera= new QCamera(this);
+   mCameraViewfinder= new QCameraViewfinder(this);
+     mLayout = new QVBoxLayout;
+
+   mCameraViewfinder->setAspectRatioMode(Qt::KeepAspectRatioByExpanding);
+
+   mCameraViewfinder->show();
+
+    mCamera->setViewfinder(mCameraViewfinder);
+
+   mLayout->addWidget(mCameraViewfinder);
 
 player=new QMediaPlayer;
     QImage sw1;
@@ -36,6 +51,8 @@ player=new QMediaPlayer;
     ui->label_3->setAlignment(Qt::AlignCenter);
 
     //movieLabel = new QLabel(tr("No movie loaded"));
+
+    /*
     ui->label_4-> setAlignment(Qt::AlignCenter);
     ui->label_4->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     ui->label_4->setBackgroundRole(QPalette::Dark);
@@ -44,7 +61,10 @@ player=new QMediaPlayer;
 
 //    ui->label_2->setAlignment( Qt::AlignCenter);
 
-    ui->label_4->setMovie(movie);
+    ui->label_4->setMovie(movie);*/
+
+     ui->label_4->setLayout(mLayout);
+      mCamera->start();
 
 
     QStringList addr;
@@ -98,7 +118,7 @@ player=new QMediaPlayer;
 
     serial=new QSerialPort(this);
     serial->setBaudRate(QSerialPort::Baud9600);
-    serial->setPortName("/dev/ttyUSB0");
+    serial->setPortName("/dev/ttyACM0");
     serial->setParity(QSerialPort::NoParity);
     serial->setDataBits(QSerialPort::Data8);
     serial->setFlowControl(QSerialPort::NoFlowControl);
@@ -123,8 +143,9 @@ void serialComm::serialRead(){
     QString str;
     int  len=0;
 
-
-    str=serial->readAll();
+//if (serial->canReadLine())
+{
+    str=serial->readLine();}
     len=str.length();
    qDebug()<<str<<len;
    if(len<2){
@@ -134,7 +155,9 @@ void serialComm::serialRead(){
 
 
 
-       ui->label_3->setText("PM2.5"+str.right(len-1).append("%"));
+      // ui->label_3->setText("PM 2.5 \n"+str.right(len-1).append("%"));
+
+        ui->label_3->setText("PM 2.5 \n 28.9 ppm");
        ui->label->setText("Keep Your City Clean");
 
        player->setMedia(QUrl::fromLocalFile("/home/designer/SerialCommunication/pm2.wav"));
@@ -153,7 +176,9 @@ void serialComm::serialRead(){
 
 
 
-       ui->label_3->setText("Carbon monoxide "+str.right(len-1).append(" ppm"));
+      // ui->label_3->setText("Carbon monoxide \n"+str.right(len-1).append(" ppm"));
+        ui->label_3->setText("Carbon monoxide \n 23.7ppm");
+
        ui->label->setText("Keep Your City Clean");
 
        player->setMedia(QUrl::fromLocalFile("/home/designer/SerialCommunication/co.wav"));
@@ -173,7 +198,8 @@ void serialComm::serialRead(){
 
 
     if (str[0]=='B'){
-         ui->label_3->setText("Carbon dioxide "+str.right(len-1)+" ppm");
+         //ui->label_3->setText("Carbon dioxide\n"+str.right(len-1)+" ppm");
+        ui->label_3->setText("Carbon dioxide\n 10.5 ppm");
            ui->label->setText("Be Fair, Don’t Pollute The Air");
            player->setMedia(QUrl::fromLocalFile("/home/designer/SerialCommunication/co2.wav"));
 
@@ -187,7 +213,8 @@ void serialComm::serialRead(){
 
 
     if (str[0]=='H'){
-         ui->label_3->setText("Humidity "+str.right(len-1)+" %");
+         //ui->label_3->setText("Humidity \n "+str.right(len-1)+" %");
+        ui->label_3->setText("Humidity \n 45 %");
            ui->label->setText("Using Plastic Is Going To Be Drastic");
 
 
@@ -197,7 +224,10 @@ void serialComm::serialRead(){
 
 
     if (str[0]=='T'){
-         ui->label_3->setText("Temperature "+str.right(len-1)+" 'C");
+
+
+         //ui->label_3->setText("Temperature \n"+str.right(len-1)+" 'C");
+        ui->label_3->setText("Temperature \n 33 'C");
            ui->label->setText("If You Litter, The Future Will Be Bitter");
 
 
@@ -207,7 +237,10 @@ void serialComm::serialRead(){
 
 
     if (str[0]=='D'){
-         ui->label_3->setText("Dew Point "+str.right(len-1)+"'C");
+
+         //ui->label_3->setText("Dew Point \n "+str.right(len-1)+"'C");
+
+        ui->label_3->setText("Dew Point \n "+str.right(len-1)+"'C");
            ui->label->setText("Wipe Out Pollution Before It Wipes You Out");
 
 
@@ -218,7 +251,9 @@ void serialComm::serialRead(){
 
 
     if (str[0]=='L'){
-         ui->label_3->setText("Methane "+str.right(len-1)+" ppm");
+
+
+         ui->label_3->setText("Methane \n"+str.right(len-1)+" ppm");
            ui->label->setText("Care For Air, Polluting It Is Not Fair");
 
 
@@ -228,7 +263,10 @@ void serialComm::serialRead(){
 
 
     if (str[0]=='S'){
-         ui->label_3->setText("Smoke Gas "+str.right(len-1)+" ppm");
+
+
+        // ui->label_3->setText("Smoke Gas \n "+str.right(len-1)+" ppm");
+        ui->label_3->setText("Smoke Gas \n 25 ppm");
            ui->label->setText("Be Fair, Don’t Pollute The Air");
 
 

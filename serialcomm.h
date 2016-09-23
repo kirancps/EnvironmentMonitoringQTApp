@@ -12,6 +12,10 @@
 namespace Ui {
 class serialComm;
 }
+class QCamera;
+class QCameraViewfinder;
+class QVBoxLayout;
+
 
 class serialComm : public QMainWindow
 {
@@ -29,6 +33,9 @@ private slots:
 
 private:
     Ui::serialComm *ui;
+    QCamera *mCamera;
+    QCameraViewfinder *mCameraViewfinder;
+    QVBoxLayout *mLayout;
 };
 
 #endif // SERIALCOMM_H
